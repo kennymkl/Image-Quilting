@@ -29,28 +29,33 @@ class ImageQuilting_AlgorithmAssignment(ImageQuilting):
         block_overlap: int
     ) -> BoxIndeces:
 
-        # SCORE +1 by iterating through all other possible patch locations
+        # SCORE +1 by iterating through all other possible patch locations//MAYBE DONE?
         def enumerate_other_indeces() -> typing.Sequence[BoxIndeces]:
             # Hint: use self.texture_image as reference
             # TODO: Replace this RANDOM implementation
-            for _ in range(20):
-                texture_height, texture_width, _ = self.texture_image.shape
-                patch_height, patch_width, _ = canvas_patch.shape
-                random_y = np.random.randint(0, texture_height - patch_height)
-                random_x = np.random.randint(0, texture_width - patch_width)
-                yield BoxIndeces(
-                    top=random_y,
-                    bottom=random_y + patch_height,
-                    left=random_x,
-                    right=random_x + patch_width
-                )
+            texture_height, texture_width, _ = self.texture_image.shape
+            patch_height, patch_width, _ = canvas_patch.shape
+            for y in range(texture_height - patch_height):
+                for x in range(texture_width - patch_width):
+                    if (y, x) == (canvas_box.top, canvas_box.left):
+                        continue
+                    yield BoxIndeces(
+                        top=y,
+                        bottom=y + patch_height,
+                        left=x,
+                        right=x + patch_width
+            )
 
-        # SCORE +1 by finding the overlap area in canvas_patch
-        def extract_canvas_overlap() -> np.ndarray:
-            # Hint: use canvas_patch, canvas_indeces, block_overlap
+        # SCORE +1 by finding the overlap area in canvas_patch//MAYBE DONE?
+        overlap_top = block_overlap.top - canvas_indeces.top
+        overlap_bottom = overlap_top + block_overlap.height
+        overlap_left = block_overlap.left - canvas_indeces.left
+        overlap_right = overlap_left + block_overlap.width
 
-            # TODO: Replace this IDENTITY implementation
-            return canvas_patch
+    # Extract the overlap area from the canvas_patch
+        canvas_overlap = canvas_patch[overlap_top:overlap_bottom, overlap_left:overlap_right, :]
+
+        return canvas_overlap
 
         # SCORE +1 by finding the overlap area in patch
         def extract_overlap(patch: np.ndarray) -> np.ndarray:
